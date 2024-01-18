@@ -1,8 +1,15 @@
-use std::{collections::VecDeque, pin::Pin, task::{Context, Poll}};
+use std::{
+    collections::VecDeque,
+    pin::Pin,
+    task::{Context, Poll},
+};
 
 use bytes::Bytes;
 use futures::Stream;
-use s3s::{StdError, stream::{ByteStream, RemainingLength}};
+use s3s::{
+    stream::{ByteStream, RemainingLength},
+    StdError,
+};
 
 pub(crate) struct VecByteStream {
     queue: VecDeque<Bytes>,
@@ -23,6 +30,7 @@ impl VecByteStream {
         }
     }
 
+    #[allow(dead_code)]
     pub fn exact_remaining_length(&self) -> usize {
         self.remaining_bytes
     }

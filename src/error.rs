@@ -1,6 +1,5 @@
 // apache 2.0 copyright github.com/Nugine
 
-
 use s3s::S3Error;
 use s3s::S3ErrorCode;
 use s3s::StdError;

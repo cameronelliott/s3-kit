@@ -3,8 +3,6 @@
 use std::hash::Hasher;
 
 use digest::Digest;
-use numeric_cast::TruncatingCast;
-use rust_utils::default::default;
 
 //use crate::fs::InternalInfo;
 
@@ -32,44 +30,62 @@ impl ChecksumCalculator {
         }
     }
 
-    pub fn finalize(self) -> s3s::dto::Checksum {
-        let mut ans: s3s::dto::Checksum = default();
-        if let Some(crc32) = self.crc32 {
-            let sum = crc32.finalize().to_be_bytes();
-            ans.checksum_crc32 = Some(base64(&sum));
-        }
-        if let Some(crc32c) = self.crc32c {
-            let sum = crc32c.finish().truncating_cast::<u32>().to_be_bytes();
-            ans.checksum_crc32c = Some(base64(&sum));
-        }
-        if let Some(sha1) = self.sha1 {
-            let sum = sha1.finalize();
-            ans.checksum_sha1 = Some(base64(sum.as_ref()));
-        }
-        if let Some(sha256) = self.sha256 {
-            let sum = sha256.finalize();
-            ans.checksum_sha256 = Some(base64(sum.as_ref()));
-        }
-        ans
-    }
+    // Remove the unused `finalize` method
+    // pub fn finalize(self) -> s3s::dto::Checksum {
+    //     let mut ans: s3s::dto::Checksum = default();
+    //     if let Some(crc32) = self.crc32 {
+    //         let sum = crc32.finalize().to_be_bytes();
+    //         ans.checksum_crc32 = Some(base64(&sum));
+    //     }
+    //     if let Some(crc32c) = self.crc32c {
+    //         let sum = crc32c.finish().truncating_cast::<u32>().to_be_bytes();
+    //         ans.checksum_crc32c = Some(base64(&sum));
+    //     }
+    //     if let Some(sha1) = self.sha1 {
+    //         let sum = sha1.finalize();
+    //         ans.checksum_sha1 = Some(base64(sum.as_ref()));
+    //     }
+    //     if let Some(sha256) = self.sha256 {
+    //         let sum = sha256.finalize();
+    //         ans.checksum_sha256 = Some(base64(sum.as_ref()));
+    //     }
+    //     ans
+    // }
 }
 
+#[allow(dead_code)]
 fn base64(input: &[u8]) -> String {
     base64_simd::STANDARD.encode_to_string(input)
 }
 
-pub fn modify_internal_info(info: &mut serde_json::Map<String, serde_json::Value>, checksum: &s3s::dto::Checksum) {
+#[allow(dead_code)]
+pub fn modify_internal_info(
+    info: &mut serde_json::Map<String, serde_json::Value>,
+    checksum: &s3s::dto::Checksum,
+) {
     if let Some(checksum_crc32) = &checksum.checksum_crc32 {
-        info.insert("checksum_crc32".to_owned(), serde_json::Value::String(checksum_crc32.clone()));
+        info.insert(
+            "checksum_crc32".to_owned(),
+            serde_json::Value::String(checksum_crc32.clone()),
+        );
     }
     if let Some(checksum_crc32c) = &checksum.checksum_crc32c {
-        info.insert("checksum_crc32c".to_owned(), serde_json::Value::String(checksum_crc32c.clone()));
+        info.insert(
+            "checksum_crc32c".to_owned(),
+            serde_json::Value::String(checksum_crc32c.clone()),
+        );
     }
     if let Some(checksum_sha1) = &checksum.checksum_sha1 {
-        info.insert("checksum_sha1".to_owned(), serde_json::Value::String(checksum_sha1.clone()));
+        info.insert(
+            "checksum_sha1".to_owned(),
+            serde_json::Value::String(checksum_sha1.clone()),
+        );
     }
     if let Some(checksum_sha256) = &checksum.checksum_sha256 {
-        info.insert("checksum_sha256".to_owned(), serde_json::Value::String(checksum_sha256.clone()));
+        info.insert(
+            "checksum_sha256".to_owned(),
+            serde_json::Value::String(checksum_sha256.clone()),
+        );
     }
 }
 

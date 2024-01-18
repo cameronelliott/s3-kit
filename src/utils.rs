@@ -1,6 +1,5 @@
 // apache 2.0 copyright github.com/Nugine
 
-
 use crate::error::*;
 
 use s3s::StdError;
@@ -31,7 +30,11 @@ where
     Ok(nwritten)
 }
 
-pub fn bytes_stream<S, E>(stream: S, content_length: usize) -> impl Stream<Item = Result<Bytes, E>> + Send + 'static
+#[allow(dead_code)]
+pub fn bytes_stream<S, E>(
+    stream: S,
+    content_length: usize,
+) -> impl Stream<Item = Result<Bytes, E>> + Send + 'static
 where
     S: Stream<Item = Result<Bytes, E>> + Send + 'static,
     E: Send + 'static,
@@ -51,6 +54,7 @@ where
     })
 }
 
+#[allow(dead_code)]
 pub fn hex(input: impl AsRef<[u8]>) -> String {
     hex_simd::encode_to_string(input.as_ref(), hex_simd::AsciiCase::Lower)
 }

@@ -2,18 +2,11 @@
 #![deny(clippy::all, clippy::pedantic)]
 
 use s3s::auth::SimpleAuth;
-use s3s::dto::GetObjectInput;
-use s3s::dto::GetObjectOutput;
-use s3s::dto::*;
-use s3s::s3_error;
+
 use s3s::service::S3ServiceBuilder;
-use s3s::S3Result;
-use s3s::S3;
-use s3s::{S3Request, S3Response};
 
 use std::net::TcpListener;
 use std::path::PathBuf;
-use std::sync::atomic::AtomicU64;
 
 use clap::Parser;
 use hyper::server::Server;
@@ -24,11 +17,11 @@ mod error;
 pub use error::Error;
 pub use error::Result;
 
-mod vec_byte_stream;
 mod checksum;
-mod utils;
 mod s3_not_impl;
-use s3_not_impl::S3_not_impl;
+mod utils;
+mod vec_byte_stream;
+
 mod s3_btree;
 use s3_btree::S3Btree;
 

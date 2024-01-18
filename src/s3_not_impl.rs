@@ -11,40 +11,21 @@ use s3s::S3;
 use s3s::{S3Request, S3Response};
 
 use std::path::PathBuf;
-use std::sync::atomic::AtomicU64;
 
-use crate::error::Error;
 use crate::error::Result;
 
 #[derive(Debug)]
-pub struct S3_not_impl {
-    pub(crate) root: PathBuf,
-    tmp_file_counter: AtomicU64,
-}
+pub struct S3NotImpl {}
 
-impl S3_not_impl {
-    pub fn new(root: PathBuf) -> Result<Self> {
-        if !root.is_dir() {
-            return Err(Error::from_string(format!("{:?} is not a directory", root)));
-        }
-        Ok(Self {
-            root,
-            tmp_file_counter: AtomicU64::new(0),
-        })
-    }
-
-    pub fn root(&self) -> &PathBuf {
-        &self.root
-    }
-
-    pub fn tmp_file_counter(&self) -> u64 {
-        self.tmp_file_counter
-            .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+impl S3NotImpl {
+    #[allow(dead_code)]
+    pub fn new(_root: PathBuf) -> Result<Self> {
+        Ok(Self {})
     }
 }
 
 #[async_trait::async_trait]
-impl S3 for S3_not_impl {
+impl S3 for S3NotImpl {
     #[tracing::instrument]
     async fn get_object(
         &self,
