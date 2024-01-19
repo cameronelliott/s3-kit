@@ -1,6 +1,9 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all, clippy::pedantic)]
 
+// S3DEC
+// Dec stands for distributed erasure coding.mod s3_btree;
+
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
@@ -36,12 +39,15 @@ use crate::utils::copy_bytes;
 use crate::vec_byte_stream::VecByteStream;
 
 #[derive(Debug)]
-pub struct S3Btree {
+pub struct S3DEC {
     objects: Arc<RwLock<BTreeMap<String, Vec<u8>>>>,
 }
 
-impl S3Btree {
-    pub fn new() -> Result<Self> {
+impl S3DEC {
+    pub fn new(root: PathBuf) -> Result<Self> {
+        if !root.is_dir() {
+            return Err(Error::from_string(format!("{:?} is not a directory", root)));
+        }
         Ok(Self {
             objects: Arc::new(RwLock::new(BTreeMap::new())),
         })
@@ -49,7 +55,7 @@ impl S3Btree {
 }
 
 #[async_trait::async_trait]
-impl S3 for S3Btree {
+impl S3 for S3DEC {
     #[tracing::instrument]
     async fn get_object(
         &self,
@@ -143,7 +149,7 @@ impl S3 for S3Btree {
     }
 
     async fn put_object(
-        self: &S3Btree,
+        self: &S3DEC,
         req: S3Request<PutObjectInput>,
     ) -> S3Result<S3Response<PutObjectOutput>> {
         let input = req.input;
@@ -230,7 +236,7 @@ impl S3 for S3Btree {
 
         let last_modified = Timestamp::from(SystemTime::now());
         let object_metadata = None;
-
+        
         // TODO: detect content type
         let content_type = mime::APPLICATION_OCTET_STREAM;
 

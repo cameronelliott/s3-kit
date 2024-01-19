@@ -848,6 +848,7 @@ dependencies = [
  "hyper-tls",
  "hyper-util",
  "md-5",
+ "mime",
  "native-tls",
  "nugine-rust-utils",
  "numeric_cast",

@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all, clippy::pedantic)]
+// https://github.com/rust-lang/rust/issues/63063
+#![feature(type_alias_impl_trait)]
 
 use s3s::auth::SimpleAuth;
 use s3s::service::S3ServiceBuilder;
@@ -18,7 +20,9 @@ pub use error::Result;
 
 mod checksum;
 mod s3_btree;
+mod s3_dec;
 mod s3_not_impl;
+mod s3_proxy;
 mod utils;
 mod vec_byte_stream;
 use s3_btree::S3Btree;
@@ -98,7 +102,8 @@ fn main() -> Result {
 #[tokio::main]
 async fn run(opt: Opt) -> Result {
     // Setup S3 provider
-    let fs = S3Btree::new(opt.root)?;
+    //let fs = S3Btree::new()?;
+    let fs = s3_proxy::S3ServiceProxy::new()?;
 
     // Setup S3 service
     let service = {
