@@ -2,6 +2,7 @@
 #![deny(clippy::all, clippy::pedantic)]
 // https://github.com/rust-lang/rust/issues/63063
 #![feature(type_alias_impl_trait)]
+#![feature(trait_alias)]
 
 use s3s::auth::SimpleAuth;
 use s3s::service::S3ServiceBuilder;

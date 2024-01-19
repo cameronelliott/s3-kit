@@ -45,12 +45,12 @@ use futures::Future;
 this is an interim test before writing the distributed erasure coding
 */
 
-// type XXX = dyn Service<
-//     S3Request<GetObjectInput>,
-//     Response = S3Result<S3Response<GetObjectOutput>>,
-//     Error = Error,
-//     Future = impl Future<Output = Result<S3Result<S3Response<GetObjectOutput>>>> + Send,
-// >;
+type XXX = dyn Service<
+    S3Request<GetObjectInput>,
+    Response = S3Result<S3Response<GetObjectOutput>>,
+    Error = Error,
+    Future = dyn Future<Output = Result<S3Result<S3Response<GetObjectOutput>>>> + Send,
+>;
 
 #[derive(Debug)]
 pub struct S3ServiceProxy {
