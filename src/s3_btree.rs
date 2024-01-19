@@ -2,7 +2,7 @@
 #![deny(clippy::all, clippy::pedantic)]
 
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+
 
 use std::sync::Arc;
 
@@ -29,7 +29,7 @@ use tokio::sync::RwLock;
 use std::io::Cursor;
 use tokio::io::BufWriter;
 
-use crate::error::Error;
+
 use crate::error::Result;
 
 use crate::utils::copy_bytes;

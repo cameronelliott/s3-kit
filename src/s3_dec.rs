@@ -5,7 +5,6 @@
 // Dec stands for distributed erasure coding.mod s3_btree;
 
 use std::collections::BTreeMap;
-use std::path::PathBuf;
 
 use std::sync::Arc;
 
@@ -32,7 +31,6 @@ use tokio::sync::RwLock;
 use std::io::Cursor;
 use tokio::io::BufWriter;
 
-use crate::error::Error;
 use crate::error::Result;
 
 use crate::utils::copy_bytes;
@@ -44,10 +42,8 @@ pub struct S3DEC {
 }
 
 impl S3DEC {
-    pub fn new(root: PathBuf) -> Result<Self> {
-        if !root.is_dir() {
-            return Err(Error::from_string(format!("{:?} is not a directory", root)));
-        }
+    #[allow(dead_code)]
+    pub fn new() -> Result<Self> {
         Ok(Self {
             objects: Arc::new(RwLock::new(BTreeMap::new())),
         })
@@ -236,7 +232,7 @@ impl S3 for S3DEC {
 
         let last_modified = Timestamp::from(SystemTime::now());
         let object_metadata = None;
-        
+
         // TODO: detect content type
         let content_type = mime::APPLICATION_OCTET_STREAM;
 

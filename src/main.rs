@@ -26,7 +26,7 @@ mod s3_not_impl;
 mod s3_proxy;
 mod utils;
 mod vec_byte_stream;
-use s3_btree::S3Btree;
+
 
 #[derive(Debug, Parser)]
 #[command(version)]
