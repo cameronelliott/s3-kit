@@ -2,7 +2,6 @@
 #![deny(clippy::all, clippy::pedantic)]
 
 use s3s::auth::SimpleAuth;
-
 use s3s::service::S3ServiceBuilder;
 
 use std::net::TcpListener;
@@ -18,11 +17,10 @@ pub use error::Error;
 pub use error::Result;
 
 mod checksum;
+mod s3_btree;
 mod s3_not_impl;
 mod utils;
 mod vec_byte_stream;
-
-mod s3_btree;
 use s3_btree::S3Btree;
 
 #[derive(Debug, Parser)]
@@ -125,7 +123,6 @@ async fn run(opt: Opt) -> Result {
 
     let server = Server::from_tcp(listener)?.serve(service.into_shared().into_make_service());
 
-    println!("server is running at http://{local_addr}");
     info!("server is running at http://{local_addr}");
     server.with_graceful_shutdown(shutdown_signal()).await?;
 
