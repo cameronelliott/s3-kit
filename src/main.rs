@@ -23,10 +23,11 @@ mod checksum;
 mod s3_btree;
 mod s3_dec;
 mod s3_not_impl;
-mod s3_proxy;
+// on hold
+//mod s3_proxy;
+mod s3_new_proxy;
 mod utils;
 mod vec_byte_stream;
-
 
 #[derive(Debug, Parser)]
 #[command(version)]
@@ -104,7 +105,7 @@ fn main() -> Result {
 async fn run(opt: Opt) -> Result {
     // Setup S3 provider
     //let fs = S3Btree::new()?;
-    let fs = s3_proxy::S3ServiceProxy::new()?;
+    let fs = s3_proxy::Proxy::new()?;
 
     // Setup S3 service
     let service = {

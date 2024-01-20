@@ -4,10 +4,8 @@
 // S3DEC
 // Dec stands for distributed erasure coding.mod s3_btree;
 
-
-
 use hyper::service::Service;
-
+use hyper::Request;
 use s3s::dto::GetObjectInput;
 use s3s::dto::GetObjectOutput;
 use s3s::dto::*;
@@ -20,8 +18,6 @@ use s3s::service::S3ServiceBuilder;
 use s3s::service::SharedS3Service;
 use s3s::S3;
 use s3s::{S3Request, S3Response};
-
-
 
 use crate::error::Result;
 
@@ -38,58 +34,68 @@ this is an interim test before writing the distributed erasure coding
 //     Future = dyn Future<Output = Result<S3Result<S3Response<GetObjectOutput>>>> + Send,
 // >;
 
-type Z = Box<
-    dyn Service<
-            S3Request<GetObjectInput>,
-            Response = S3Result<S3Response<GetObjectOutput>>,
-            Error = Error,
-            Future = dyn futures::Future<Output = Result<S3Result<S3Response<GetObjectOutput>>>>
-                         + Send,
-        > + Send,
->;
+// type Z = Box<
+//     dyn Service<
+//             S3Request<GetObjectInput>,
+//             Response = S3Result<S3Response<GetObjectOutput>>,
+//             Error = Error,
+//             Future = dyn futures::Future<Output = Result<S3Result<S3Response<GetObjectOutput>>>>
+//                          + Send,
+//         > + Send,
+// >;
 
-#[macro_use]
 use derivative::Derivative;
+
 //#[derive(Debug)]
+
+// pub struct Proxy {
+//     //x: Arc<RwLock<Z>>,
+//     #[derivative(Debug = "ignore")]
+//     target_service: MakeService<SharedS3Service>,
+// }
+
 #[derive(Derivative)]
 #[derivative(Debug)]
-pub struct S3ServiceProxy {
-    //x: Arc<RwLock<Z>>,
+pub struct Proxy {
     #[derivative(Debug = "ignore")]
-    x: MakeService<SharedS3Service>,
+    client: aws_sdk_s3::Client,
 }
 
-impl S3ServiceProxy {
-    pub fn new() -> Result<Self> {
+impl From<aws_sdk_s3::Client> for Proxy {
+    fn from(value: aws_sdk_s3::Client) -> Self {
+        Self { client: value}
+    }
+}
+
+impl Proxy {
+    pub fn new(client:aws_sdk_s3::Client) -> Result<Self> {
         let btree = S3Btree::new()?;
         let service = {
             let b = S3ServiceBuilder::new(btree);
             b.build()
         };
-        let sss = service.into_shared().into_make_service();
+        let service = service.into_shared().into_make_service();
 
         Ok(Self {
             //x: Arc::new(RwLock::new(sss)),
-            x: sss,
+            target_service: service,
+            client: client,
         })
     }
 }
 
 #[async_trait::async_trait]
-impl S3 for S3ServiceProxy {
+impl S3 for Proxy {
     #[tracing::instrument]
     async fn get_object(
         &self,
-        _req: S3Request<GetObjectInput>,
+        req: S3Request<GetObjectInput>,
     ) -> S3Result<S3Response<GetObjectOutput>> {
-        //
-        //self.target.get_object(req).await
-        //
         return Err(s3_error!(NoSuchKey));
     }
 
     async fn put_object(
-        self: &S3ServiceProxy,
+        self: &Proxy,
         _req: S3Request<PutObjectInput>,
     ) -> S3Result<S3Response<PutObjectOutput>> {
         //
@@ -113,9 +119,17 @@ impl S3 for S3ServiceProxy {
         &self,
         _req: S3Request<HeadObjectInput>,
     ) -> S3Result<S3Response<HeadObjectOutput>> {
-        //
-        //self.target.head_object(req).await
-        //
-        return Err(s3_error!(NoSuchKey));
+        let a = self.target_service.call("nada").await;
+        let a = a.unwrap();
+
+        let hyper_request = Request::new("fake body".into());
+
+        let a = a.call(hyper_request).await;
+
+        let a = a.unwrap();
+
+        let x: S3Result<S3Response<HeadObjectOutput>> = a;
+
+        return x;
     }
 }
