@@ -23,9 +23,7 @@ mod checksum;
 mod s3_btree;
 mod s3_dec;
 mod s3_not_impl;
-// on hold
-//mod s3_proxy;
-mod s3_new_proxy;
+mod s3_proxy;
 mod utils;
 mod vec_byte_stream;
 
