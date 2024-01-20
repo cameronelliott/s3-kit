@@ -14,18 +14,8 @@ use clap::Parser;
 use hyper::server::Server;
 use tracing::info;
 
-#[macro_use]
-mod error;
-pub use error::Error;
-pub use error::Result;
-
-mod checksum;
-mod s3_btree;
-mod s3_dec;
-mod s3_not_impl;
-mod s3_proxy;
-mod utils;
-mod vec_byte_stream;
+use foo::error::*;
+use foo::s3_btree::S3Btree;
 
 #[derive(Debug, Parser)]
 #[command(version)]
@@ -92,7 +82,7 @@ fn main() -> Result {
         root: PathBuf::from("/tmp"),
     };
     //println!("{:?}", opt);
-    check_cli_args(&opt).map_err(error::Error::from_string)?;
+    check_cli_args(&opt).map_err(foo::error::Error::from_string)?;
 
     setup_tracing();
 
@@ -103,7 +93,8 @@ fn main() -> Result {
 async fn run(opt: Opt) -> Result {
     // Setup S3 provider
     //let fs = S3Btree::new()?;
-    let fs = s3_proxy::Proxy::new()?;
+    // let _fs = foo::s3_proxy_example::Proxy::<S3ToHttp>::new()?;
+    let fs = foo::s3_proxy_example::Proxy::<S3Btree>::new()?;
 
     // Setup S3 service
     let service = {

@@ -761,6 +761,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "foo"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "aws-sdk-s3",
+ "base64-simd",
+ "bytes",
+ "bytes-stream",
+ "clap",
+ "crc32c",
+ "crc32fast",
+ "derivative",
+ "digest",
+ "futures",
+ "hex-simd",
+ "hyper 0.14.28",
+ "hyper-tls",
+ "hyper-util",
+ "md-5",
+ "mime",
+ "native-tls",
+ "nugine-rust-utils",
+ "numeric_cast",
+ "s3s",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "tokio",
+ "tokio-native-tls",
+ "tokio-util",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
+ "transform-stream",
+]
+
+[[package]]
 name = "foreign-types"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1275,43 +1312,6 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "my-s3"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "aws-sdk-s3",
- "base64-simd",
- "bytes",
- "bytes-stream",
- "clap",
- "crc32c",
- "crc32fast",
- "derivative",
- "digest",
- "futures",
- "hex-simd",
- "hyper 0.14.28",
- "hyper-tls",
- "hyper-util",
- "md-5",
- "mime",
- "native-tls",
- "nugine-rust-utils",
- "numeric_cast",
- "s3s",
- "serde_json",
- "sha1",
- "sha2",
- "tokio",
- "tokio-native-tls",
- "tokio-util",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "transform-stream",
 ]
 
 [[package]]

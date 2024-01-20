@@ -18,6 +18,16 @@ use crate::error::Result;
 use crate::s3_btree::S3Btree;
 
 #[derive(Debug)]
+pub struct S3ToHttp;
+
+#[async_trait::async_trait]
+impl S3 for S3ToHttp {}
+
+//
+//
+//
+
+#[derive(Debug)]
 pub struct Proxy<T: S3> {
     target: T,
 }
@@ -27,6 +37,15 @@ impl Proxy<S3Btree> {
     pub fn new() -> Result<Self> {
         Ok(Self {
             target: S3Btree::new()?,
+        })
+    }
+}
+
+impl Proxy<S3ToHttp> {
+    #[allow(dead_code)]
+    pub fn new() -> Result<Self> {
+        Ok(Self {
+            target: S3ToHttp {},
         })
     }
 }
@@ -67,6 +86,7 @@ impl<T: S3 + std::fmt::Debug> S3 for Proxy<T> {
         req: S3Request<HeadObjectInput>,
     ) -> S3Result<S3Response<HeadObjectOutput>> {
         //
+        //println!("head_object: {:?}", req);
         self.target.head_object(req).await
         //
     }
