@@ -4,38 +4,18 @@
 // S3DEC
 // Dec stands for distributed erasure coding.mod s3_btree;
 
-use std::collections::BTreeMap;
-
-use std::sync::Arc;
-
-use std::time::SystemTime;
-
-use bytes::Bytes;
-
-use futures::TryStreamExt;
-use rust_utils::default::default;
 use s3s::dto::GetObjectInput;
 use s3s::dto::GetObjectOutput;
 use s3s::dto::*;
-use s3s::s3_error;
 
 use s3s::S3Result;
 
 use s3s::S3;
 use s3s::{S3Request, S3Response};
 
-use md5::Digest;
-use md5::Md5;
-use tokio::sync::RwLock;
-
-use std::io::Cursor;
-use tokio::io::BufWriter;
-
 use crate::error::Result;
 
 use crate::s3_btree::S3Btree;
-use crate::utils::copy_bytes;
-use crate::vec_byte_stream::VecByteStream;
 
 #[derive(Debug)]
 pub struct Proxy<T: S3> {
