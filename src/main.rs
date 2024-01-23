@@ -94,6 +94,14 @@ async fn run(opt: Opt) -> Result {
     // Setup S3 provider
     //let fs = S3Btree::new()?;
     // let _fs = foo::s3_proxy_example::Proxy::<S3ToHttp>::new()?;
+    let sdk_conf = aws_config::from_env().endpoint_url("url").load().await;
+    let client = aws_sdk_s3::Client::from_conf(
+        aws_sdk_s3::config::Builder::from(&sdk_conf)
+            .force_path_style(true)
+            .build(),
+    );
+    let _proxy = s3s_aws::Proxy::from(client);
+
     let fs = foo::s3_proxy_example::Proxy::<S3Btree>::new()?;
 
     // Setup S3 service
