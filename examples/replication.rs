@@ -4,6 +4,8 @@
 #![feature(type_alias_impl_trait)]
 #![feature(trait_alias)]
 
+use foo::s3_replication::S3Replication;
+use foo::tracing::setup_tracing;
 use s3s::auth::{self};
 use s3s::service::S3ServiceBuilder;
 
@@ -18,19 +20,19 @@ use foo::s3_btree::S3Btree;
 
 #[tokio::main]
 async fn main() -> Result {
-    env_logger::init();
+    setup_tracing();
 
     let flags = xflags::parse_or_exit! {
         ///listener port
-        optional port: u16
+        optional -p, --port port: u16
         /// bind address
-        optional bindaddr: String
+        optional -b,--bindaddr bindaddr: String
     };
 
     let port = flags.port.unwrap_or(8080);
     let bindaddr = flags.bindaddr.unwrap_or("127.0.0.1".to_string());
 
-    let fs = S3Btree::new()?;
+    let fs: S3Replication<S3Btree> = S3Replication::default();
 
     // Setup S3 service
     let service = {

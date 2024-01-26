@@ -22,9 +22,9 @@ async fn main() -> Result {
 
     let flags = xflags::parse_or_exit! {
         ///listener port
-        optional port: u16
+        optional -p, --port port: u16
         /// bind address
-        optional bindaddr: String
+        optional -b,--bindaddr bindaddr: String
     };
 
     let port = flags.port.unwrap_or(8080);

@@ -38,6 +38,14 @@ pub struct S3Btree {
     objects: Arc<RwLock<BTreeMap<String, Vec<u8>>>>,
 }
 
+impl Default for S3Btree {
+    fn default() -> Self {
+        Self {
+            objects: Arc::new(RwLock::new(BTreeMap::new())),
+        }
+    }
+}
+
 impl S3Btree {
     pub fn new() -> Result<Self> {
         Ok(Self {

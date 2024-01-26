@@ -11,3 +11,5 @@ pub mod vec_byte_stream;
 
 pub use error::Error;
 pub use error::Result;
+
+pub mod tracing;

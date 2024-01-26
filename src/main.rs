@@ -4,6 +4,7 @@
 #![feature(type_alias_impl_trait)]
 #![feature(trait_alias)]
 
+use foo::tracing::setup_tracing;
 use s3s::auth::SimpleAuth;
 use s3s::service::S3ServiceBuilder;
 
@@ -42,20 +43,6 @@ struct Opt {
 
     /// Root directory of stored data.
     root: PathBuf,
-}
-
-fn setup_tracing() {
-    use tracing_subscriber::EnvFilter;
-
-    let env_filter = EnvFilter::from_default_env();
-    // let enable_color = std::io::stdout().is_terminal(); // TODO
-    let enable_color = false;
-
-    tracing_subscriber::fmt()
-        .pretty()
-        .with_env_filter(env_filter)
-        .with_ansi(enable_color)
-        .init();
 }
 
 fn check_cli_args(opt: &Opt) -> Result<(), String> {
