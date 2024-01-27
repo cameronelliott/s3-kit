@@ -6,7 +6,7 @@ use futures::StreamExt;
 
 use derivative::Derivative;
 
-use s3s::dto::builders::HeadObjectInputBuilder;
+use s3s::dto::builders::GetObjectInputBuilder;
 use s3s::dto::GetObjectInput;
 use s3s::dto::GetObjectOutput;
 use s3s::dto::*;
@@ -50,44 +50,22 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
     #[tracing::instrument]
     async fn get_object(
         &self,
-        _req: S3Request<GetObjectInput>,
+        r: S3Request<GetObjectInput>,
     ) -> S3Result<S3Response<GetObjectOutput>> {
-        Err(s3_error!(NoSuchKey))
-    }
-
-    async fn put_object(
-        self: &S3Replication<T>,
-        _req: S3Request<PutObjectInput>,
-    ) -> S3Result<S3Response<PutObjectOutput>> {
-        Err(s3_error!(NoSuchKey))
-    }
-
-    async fn delete_object(
-        &self,
-        _req: S3Request<DeleteObjectInput>,
-    ) -> S3Result<S3Response<DeleteObjectOutput>> {
-        Err(s3_error!(NoSuchKey))
-    }
-
-    #[tracing::instrument(skip_all)]
-    async fn head_object(
-        &self,
-        _r: S3Request<HeadObjectInput>,
-    ) -> S3Result<S3Response<HeadObjectOutput>> {
         //
         // let mut set = JoinSet::new();
 
-        let HeadObjectInput { bucket, key, .. } = _r.input;
+        let GetObjectInput { bucket, key, .. } = r.input;
 
         let fo = FuturesUnordered::new();
         for x in self.tgts.iter() {
-            let b = HeadObjectInputBuilder::default()
+            let b = GetObjectInputBuilder::default()
                 .bucket(bucket.clone())
                 .key(key.clone())
                 .build()
                 .unwrap();
 
-            let f1 = x.head_object(S3Request::new(b));
+            let f1 = x.get_object(S3Request::new(b));
 
             fo.push(f1);
         }
@@ -132,10 +110,14 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             if all_elements_equal(&ok) {
                 return results.remove(0);
             }
-        }
-        let first_ok_index = results.iter().position(|x| x.is_ok()).unwrap();
+        } else if !all_ok && !all_err {
+            //mixed results
 
-        return results.remove(first_ok_index);
+            let first_ok_index = results.iter().position(|x| x.is_ok()).unwrap();
+
+            return results.remove(first_ok_index);
+        }
+        panic!("should not get here");
 
         // while let Some(result) = fo.next().await {
         //     // Handle result
@@ -154,6 +136,56 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         //     ..Default::default()
         // };
         // Ok(S3Response::new(output))
+    }
+
+    async fn put_object(
+        self: &S3Replication<T>,
+        _req: S3Request<PutObjectInput>,
+    ) -> S3Result<S3Response<PutObjectOutput>> {
+        Err(s3_error!(NoSuchKey))
+    }
+
+    async fn delete_object(
+        &self,
+        _req: S3Request<DeleteObjectInput>,
+    ) -> S3Result<S3Response<DeleteObjectOutput>> {
+        Err(s3_error!(NoSuchKey))
+    }
+
+    #[tracing::instrument(skip_all)]
+    async fn head_object(
+        &self,
+        req: S3Request<HeadObjectInput>,
+    ) -> S3Result<S3Response<HeadObjectOutput>> {
+        //
+
+        let HeadObjectInput { bucket, key, .. } = req.input;
+
+        let goi = GetObjectInputBuilder::default()
+            .bucket(bucket.clone())
+            .key(key.clone())
+            .build()
+            .unwrap();
+
+        let goo = self.get_object(S3Request::new(goi)).await?;
+
+        let GetObjectOutput {
+            content_length,
+            content_type,
+            last_modified,
+            metadata,
+            ..
+        } = goo.output;
+
+        let output = HeadObjectOutput {
+            content_length,
+            content_type,
+            last_modified,
+            metadata,
+            ..Default::default()
+        };
+
+        Ok(S3Response::new(output))
     }
 }
 
