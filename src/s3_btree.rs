@@ -56,7 +56,7 @@ impl S3Btree {
 
 #[async_trait::async_trait]
 impl S3 for S3Btree {
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     async fn get_object(
         &self,
         req: S3Request<GetObjectInput>,
@@ -148,6 +148,7 @@ impl S3 for S3Btree {
         Ok(S3Response::new(output))
     }
 
+    #[tracing::instrument(skip_all)]
     async fn put_object(
         self: &S3Btree,
         req: S3Request<PutObjectInput>,
@@ -199,6 +200,7 @@ impl S3 for S3Btree {
         return Ok(S3Response::new(PutObjectOutput::default()));
     }
 
+    #[tracing::instrument(skip_all)]
     async fn delete_object(
         &self,
         req: S3Request<DeleteObjectInput>,
@@ -214,7 +216,7 @@ impl S3 for S3Btree {
         return Ok(S3Response::new(DeleteObjectOutput::default()));
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     async fn head_object(
         &self,
         req: S3Request<HeadObjectInput>,

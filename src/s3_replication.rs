@@ -54,7 +54,7 @@ impl<T: S3 + Default> Default for S3Replication<T> {
 
 #[async_trait::async_trait]
 impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     async fn get_object(
         &self,
         r: S3Request<GetObjectInput>,
@@ -147,6 +147,7 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         // Ok(S3Response::new(output))
     }
 
+    #[tracing::instrument(skip_all)]
     async fn put_object(
         self: &S3Replication<T>,
         req: S3Request<PutObjectInput>,
@@ -213,6 +214,7 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         Err(s3_error!(NoSuchKey))
     }
 
+    #[tracing::instrument(skip_all)]
     async fn delete_object(
         &self,
         req: S3Request<DeleteObjectInput>,
