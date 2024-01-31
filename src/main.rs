@@ -79,7 +79,7 @@ fn main() -> Result {
 #[tokio::main]
 async fn run(opt: Opt) -> Result {
     // Setup S3 provider
-    //let fs = S3Btree::new()?;
+    //let fs = S3Btree::default();
     // let _fs = foo::s3_proxy_example::Proxy::<S3ToHttp>::new()?;
     let sdk_conf = aws_config::from_env().endpoint_url("url").load().await;
     let client = aws_sdk_s3::Client::from_conf(

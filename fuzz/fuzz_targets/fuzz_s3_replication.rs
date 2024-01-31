@@ -1,17 +1,16 @@
 #![no_main]
 
+use foo::fuzzing::BackendS3Instructions;
 use foo::vec_byte_stream::VecByteStream;
 use foo::{s3_btree::S3Btree, s3_replication::S3Replication};
-use foo::fuzzing::BackendS3Instructions;
 use libfuzzer_sys::{arbitrary::Arbitrary, fuzz_target};
 use s3s::dto::StreamingBlob;
 use s3s::dto::{DeleteObjectInput, GetObjectInput, PutObjectInput};
 use s3s::S3;
 use s3s::{dto::HeadObjectInput, S3Request};
-use serde::{Deserialize, Serialize};
+
 use std::sync::Once;
 use tokio::runtime::Runtime;
-use tracing::info;
 
 static _INIT: Once = Once::new();
 
@@ -22,8 +21,6 @@ enum Operation {
     Head,
     Delete,
 }
-
-
 
 #[derive(Debug, Arbitrary)]
 struct Action {
@@ -56,11 +53,14 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
     for i in x {
         match i.front_op {
             Operation::Put => {
-                let foo = bytes::Bytes::from(b"".to_vec());
-                let sb = StreamingBlob::new(VecByteStream::new(vec![foo]));
+                //this is how we pass data to the backend
+                let bucket_js = serde_json::to_string(&i.back_instructions).unwrap();
+
+                let body = bytes::Bytes::from(b"foof".to_vec());
+                let sb = StreamingBlob::new(VecByteStream::new(vec![body]));
                 let r = S3Request::new(
                     PutObjectInput::builder()
-                        .bucket("bucket".to_string())
+                        .bucket(bucket_js)
                         .key("key".to_string())
                         .body(Some(sb))
                         .build()
@@ -71,13 +71,10 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
                 // println!("put ok {} not {}", a.is_ok(), a.is_err());
             }
             Operation::Get => {
-                let js = serde_json::to_string(&i.back_instructions).unwrap();
-
                 let r = S3Request::new(
                     GetObjectInput::builder()
                         .bucket("bucket".to_string())
                         .key("key".to_string())
-                        .sse_customer_key(Some(js)) //overload this field to communicate with the backend
                         .build()
                         .unwrap(),
                 );

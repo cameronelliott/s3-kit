@@ -1,6 +1,3 @@
-#![forbid(unsafe_code)]
-#![deny(clippy::all, clippy::pedantic)]
-
 use std::collections::BTreeMap;
 
 use std::sync::Arc;
@@ -28,20 +25,22 @@ use tokio::sync::RwLock;
 use std::io::Cursor;
 use tokio::io::BufWriter;
 
-use crate::error::Result;
-
 use crate::utils::copy_bytes;
 use crate::vec_byte_stream::VecByteStream;
 
 #[derive(Debug)]
 struct State {
     btree: BTreeMap<String, Vec<u8>>,
+    #[cfg(fuzzing)]
+    fake_rand: bool,
 }
 
 impl Default for State {
     fn default() -> Self {
         Self {
             btree: BTreeMap::new(),
+            #[cfg(fuzzing)]
+            fake_rand: false,
         }
     }
 }
@@ -49,14 +48,12 @@ impl Default for State {
 #[derive(Debug)]
 pub struct S3Btree {
     objects: Arc<RwLock<State>>,
-    fake_rand: bool,
 }
 
 impl Default for S3Btree {
     fn default() -> Self {
         Self {
-            objects: Arc::new(RwLock::new(State::default())), 
-            fake_rand: false,
+            objects: Arc::new(RwLock::new(State::default())),
         }
     }
 }
@@ -168,23 +165,27 @@ impl S3 for S3Btree {
     ) -> S3Result<S3Response<PutObjectOutput>> {
         let input = req.input;
         let PutObjectInput {
-            body,
             key,
+            body,
+            bucket: _bucket,
             storage_class,
             ..
         } = input;
 
-        #[cfg(fuzzing_repro)]
+        // #[cfg(fuzzing)]
+        // let mut bucket = bucket;
+
+        #[cfg(fuzzing)]
         {
-            use fuzzing::BackendS3Instructions;
-            use serde::{Deserialize, Serialize};
-            let deser: BackendS3Instructions = serde_json::from_str(&bucket).unwrap();
-            bucket = deser.real_bucket;
+            use crate::fuzzing::BackendS3Instructions;
+            // use serde::{Deserialize, Serialize};
+            println!("btree put fuzz bucket in {:?}", _bucket);
+            let deser: BackendS3Instructions = serde_json::from_str(&_bucket).unwrap();
+            let _real_bucket = deser.real_bucket.clone();
 
             let mut state = self.objects.write().await;
-            println!("btree put fuzz {:?}", deserialized);
+            println!("btree put fuzz {:?}", deser);
 
-          
             if deser.rand_fail && state.fake_rand {
                 return Err(s3_error!(InternalError));
             }

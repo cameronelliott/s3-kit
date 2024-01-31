@@ -1,9 +1,10 @@
-#![feature(coverage_attribute)]
+//#![feature(coverage_attribute)]
 #![forbid(unsafe_code)]
 #![deny(clippy::all, clippy::pedantic)]
 
 #[macro_use]
 pub mod error;
+
 pub mod checksum;
 pub mod s3_btree;
 pub mod s3_dec;

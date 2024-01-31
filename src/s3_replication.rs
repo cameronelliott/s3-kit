@@ -63,7 +63,6 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             let b = GetObjectInputBuilder::default()
                 .bucket(bucket.clone())
                 .key(key.clone())
-                // .sse_customer_key(fuzz_data.clone())
                 .build()
                 .unwrap();
 
@@ -209,8 +208,6 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             return results.remove(0);
         } else if !all_ok && !all_err {
             //mixed results
-
-            todo!();
 
             let first_ok_index = results.iter().position(|x| x.is_ok()).unwrap();
 

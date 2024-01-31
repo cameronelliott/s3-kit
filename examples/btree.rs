@@ -30,7 +30,7 @@ async fn main() -> Result {
     let port = flags.port.unwrap_or(8080);
     let bindaddr = flags.bindaddr.unwrap_or("127.0.0.1".to_string());
 
-    let fs = S3Btree::new()?;
+    let fs = S3Btree::default();
 
     // Setup S3 service
     let service = {
