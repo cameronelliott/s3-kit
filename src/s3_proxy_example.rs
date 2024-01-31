@@ -36,7 +36,7 @@ impl Proxy<S3Btree> {
     #[allow(dead_code)]
     pub fn new() -> Result<Self> {
         Ok(Self {
-            target: S3Btree::new()?,
+            target: S3Btree::default(),
         })
     }
 }

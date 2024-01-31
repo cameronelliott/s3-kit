@@ -69,7 +69,7 @@ impl From<aws_sdk_s3::Client> for Proxy {
 
 impl Proxy {
     pub fn new(client:aws_sdk_s3::Client) -> Result<Self> {
-        let btree = S3Btree::new()?;
+        let btree = S3Btree::default();
         let service = {
             let b = S3ServiceBuilder::new(btree);
             b.build()
