@@ -2,3 +2,5 @@ target
 corpus
 artifacts
 coverage
+.cargo    # cargo build artifacts, but added here to fix vscode file search
+
