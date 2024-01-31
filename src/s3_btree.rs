@@ -34,25 +34,40 @@ use crate::utils::copy_bytes;
 use crate::vec_byte_stream::VecByteStream;
 
 #[derive(Debug)]
+struct State {
+    btree: BTreeMap<String, Vec<u8>>,
+}
+
+impl Default for State {
+    fn default() -> Self {
+        Self {
+            btree: BTreeMap::new(),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct S3Btree {
-    objects: Arc<RwLock<BTreeMap<String, Vec<u8>>>>,
+    objects: Arc<RwLock<State>>,
+    fake_rand: bool,
 }
 
 impl Default for S3Btree {
     fn default() -> Self {
         Self {
-            objects: Arc::new(RwLock::new(BTreeMap::new())),
+            objects: Arc::new(RwLock::new(State::default())), 
+            fake_rand: false,
         }
     }
 }
 
-impl S3Btree {
-    pub fn new() -> Result<Self> {
-        Ok(Self {
-            objects: Arc::new(RwLock::new(BTreeMap::new())),
-        })
-    }
-}
+// impl S3Btree {
+//     pub fn new() -> Result<Self> {
+//         Ok(Self {
+//             objects: Arc::new(RwLock::new(BTreeMap::defaul.())),
+//         })
+//     }
+// }
 
 #[async_trait::async_trait]
 impl S3 for S3Btree {
@@ -61,12 +76,10 @@ impl S3 for S3Btree {
         &self,
         req: S3Request<GetObjectInput>,
     ) -> S3Result<S3Response<GetObjectOutput>> {
-        let input = req.input;
+        let GetObjectInput { key, range, .. } = req.input;
 
-        //
-        let key = input.key;
         let binding = self.objects.read().await;
-        let value = binding.get(&key);
+        let value = binding.btree.get(&key);
 
         let value = match value {
             Some(value) => value,
@@ -85,7 +98,7 @@ impl S3 for S3Btree {
         let last_modified = Timestamp::from(SystemTime::now());
         let file_len = value.len() as u64;
 
-        let content_length = match input.range {
+        let content_length = match range {
             None => file_len,
             Some(range) => {
                 let file_range = range.check(file_len)?;
@@ -154,14 +167,36 @@ impl S3 for S3Btree {
         req: S3Request<PutObjectInput>,
     ) -> S3Result<S3Response<PutObjectOutput>> {
         let input = req.input;
-        if let Some(ref storage_class) = input.storage_class {
+        let PutObjectInput {
+            body,
+            key,
+            storage_class,
+            ..
+        } = input;
+
+        #[cfg(fuzzing_repro)]
+        {
+            use fuzzing::BackendS3Instructions;
+            use serde::{Deserialize, Serialize};
+            let deser: BackendS3Instructions = serde_json::from_str(&bucket).unwrap();
+            bucket = deser.real_bucket;
+
+            let mut state = self.objects.write().await;
+            println!("btree put fuzz {:?}", deserialized);
+
+          
+            if deser.rand_fail && state.fake_rand {
+                return Err(s3_error!(InternalError));
+            }
+            state.fake_rand = !state.fake_rand;
+        }
+
+        if let Some(ref storage_class) = storage_class {
             let is_valid = ["STANDARD", "REDUCED_REDUNDANCY"].contains(&storage_class.as_str());
             if !is_valid {
                 return Err(s3_error!(InvalidStorageClass));
             }
         }
-
-        let PutObjectInput { body, key, .. } = input;
 
         let Some(body) = body else {
             return Err(s3_error!(IncompleteBody));
@@ -195,7 +230,7 @@ impl S3 for S3Btree {
         let vec = writer.into_inner().into_inner();
 
         let mut objects = self.objects.write().await;
-        objects.insert(key, vec.to_owned());
+        objects.btree.insert(key, vec.to_owned());
 
         return Ok(S3Response::new(PutObjectOutput::default()));
     }
@@ -209,7 +244,7 @@ impl S3 for S3Btree {
 
         let DeleteObjectInput { key, .. } = input;
 
-        if self.objects.write().await.remove(&key).is_none() {
+        if self.objects.write().await.btree.remove(&key).is_none() {
             return Err(s3_error!(NoSuchKey));
         }
 
@@ -225,7 +260,7 @@ impl S3 for S3Btree {
 
         let key = input.key;
         let binding = self.objects.read().await;
-        let value = binding.get(&key);
+        let value = binding.btree.get(&key);
 
         let value = match value {
             Some(value) => value,

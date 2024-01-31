@@ -56,7 +56,6 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
     ) -> S3Result<S3Response<GetObjectOutput>> {
         //
         // let mut set = JoinSet::new();
-
         let GetObjectInput { bucket, key, .. } = r.input;
 
         let fo = FuturesUnordered::new();
@@ -64,6 +63,7 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             let b = GetObjectInputBuilder::default()
                 .bucket(bucket.clone())
                 .key(key.clone())
+                // .sse_customer_key(fuzz_data.clone())
                 .build()
                 .unwrap();
 
@@ -78,18 +78,18 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         let all_err = results.iter().all(|x| x.is_err());
 
         if all_err {
-            let _errs = results
-                .iter()
-                .filter(|x| x.is_err()) // redundant
-                // .map(|x| match x {
-                //     Ok(_) => "".to_string(),
-                //     Err(e) => format!("{:?}", e),
-                // })
-                .map(|x| match x {
-                    Ok(_) => todo!(),
-                    Err(e) => format!("{:?}", e),
-                })
-                .collect::<Vec<_>>();
+            // let _errs = results
+            //     .iter()
+            //     .filter(|x| x.is_err()) // redundant
+            //     // .map(|x| match x {
+            //     //     Ok(_) => "".to_string(),
+            //     //     Err(e) => format!("{:?}", e),
+            //     // })
+            //     .map(|x| match x {
+            //         Ok(_) => todo!(),
+            //         Err(e) => format!("{:?}", e),
+            //     })
+            //     .collect::<Vec<_>>();
 
             // if all_elements_equal(&errs) {
             //     let o = results.remove(0);
@@ -100,19 +100,19 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             // }
             return results.remove(0);
         } else if all_ok {
-            let _ok = results
-                .iter()
-                .filter(|x| x.is_ok()) // redundant
-                .map(|x| match x {
-                    Ok(kk) => (
-                        kk.output.content_length,
-                        //    kk.output.content_type,
-                        //  kk.output.last_modified,
-                        //  kk.output.metadata.clone(),// XX slow!
-                    ),
-                    Err(_e) => panic!(),
-                })
-                .collect::<Vec<_>>();
+            // let _ok = results
+            //     .iter()
+            //     .filter(|x| x.is_ok()) // redundant
+            //     .map(|x| match x {
+            //         Ok(kk) => (
+            //             kk.output.content_length,
+            //             //    kk.output.content_type,
+            //             //  kk.output.last_modified,
+            //             //  kk.output.metadata.clone(),// XX slow!
+            //         ),
+            //         Err(_e) => panic!(),
+            //     })
+            //     .collect::<Vec<_>>();
 
             // if all_elements_equal(&ok) {
             //     return results.remove(0);
@@ -188,14 +188,14 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         let all_err = results.iter().all(|x| x.is_err());
 
         if all_err {
-            let _errs = results
-                .iter()
-                .filter(|x| x.is_err()) // redundant
-                .map(|x| match x {
-                    Ok(_) => "".to_string(),
-                    Err(e) => format!("{:?}", e),
-                })
-                .collect::<Vec<_>>();
+            // let _errs = results
+            //     .iter()
+            //     .filter(|x| x.is_err()) // redundant
+            //     .map(|x| match x {
+            //         Ok(_) => "".to_string(),
+            //         Err(e) => format!("{:?}", e),
+            //     })
+            //     .collect::<Vec<_>>();
 
             // if all_elements_equal(&errs) {
             //     let o = results.remove(0);
@@ -209,6 +209,8 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             return results.remove(0);
         } else if !all_ok && !all_err {
             //mixed results
+
+            todo!();
 
             let first_ok_index = results.iter().position(|x| x.is_ok()).unwrap();
 
@@ -245,14 +247,14 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
         let all_err = results.iter().all(|x| x.is_err());
 
         if all_err {
-            let _errs = results
-                .iter()
-                .filter(|x| x.is_err()) // redundant
-                .map(|x| match x {
-                    Ok(_) => "".to_string(),
-                    Err(e) => format!("{:?}", e),
-                })
-                .collect::<Vec<_>>();
+            // let _errs = results
+            //     .iter()
+            //     .filter(|x| x.is_err()) // redundant
+            //     .map(|x| match x {
+            //         Ok(_) => "".to_string(),
+            //         Err(e) => format!("{:?}", e),
+            //     })
+            //     .collect::<Vec<_>>();
 
             // if all_elements_equal(&errs) {
             //     let o = results.remove(0);
@@ -263,19 +265,19 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             // }
             return results.remove(0);
         } else if all_ok {
-            let _ok = results
-                .iter()
-                .filter(|x| x.is_ok()) // redundant
-                .map(|x| match x {
-                    Ok(kk) => (
-                        kk.output.delete_marker,
-                        //    kk.output.content_type,
-                        //  kk.output.last_modified,
-                        //  kk.output.metadata.clone(),// XX slow!
-                    ),
-                    Err(_e) => panic!(),
-                })
-                .collect::<Vec<_>>();
+            // let _ok = results
+            //     .iter()
+            //     .filter(|x| x.is_ok()) // redundant
+            //     .map(|x| match x {
+            //         Ok(kk) => (
+            //             kk.output.delete_marker,
+            //             //    kk.output.content_type,
+            //             //  kk.output.last_modified,
+            //             //  kk.output.metadata.clone(),// XX slow!
+            //         ),
+            //         Err(_e) => panic!(),
+            //     })
+            //     .collect::<Vec<_>>();
 
             // if all_elements_equal(&ok) {
             //     return results.remove(0);
@@ -328,14 +330,14 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
     }
 }
 
-fn _all_elements_equal<T: PartialEq>(vec: &[T]) -> bool {
-    if vec.is_empty() {
-        return true; // or false, depending on your definition for empty vectors
-    }
+// fn _all_elements_equal<T: PartialEq>(vec: &[T]) -> bool {
+//     if vec.is_empty() {
+//         return true; // or false, depending on your definition for empty vectors
+//     }
 
-    let first = &vec[0];
-    vec.iter().all(|item| item == first)
-}
+//     let first = &vec[0];
+//     vec.iter().all(|item| item == first)
+// }
 
 // from s3s, s3s copyright stands
 pub fn hex(input: impl AsRef<[u8]>) -> String {

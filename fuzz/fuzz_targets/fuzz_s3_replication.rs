@@ -2,11 +2,13 @@
 
 use foo::vec_byte_stream::VecByteStream;
 use foo::{s3_btree::S3Btree, s3_replication::S3Replication};
+use foo::fuzzing::BackendS3Instructions;
 use libfuzzer_sys::{arbitrary::Arbitrary, fuzz_target};
 use s3s::dto::StreamingBlob;
 use s3s::dto::{DeleteObjectInput, GetObjectInput, PutObjectInput};
 use s3s::S3;
 use s3s::{dto::HeadObjectInput, S3Request};
+use serde::{Deserialize, Serialize};
 use std::sync::Once;
 use tokio::runtime::Runtime;
 use tracing::info;
@@ -21,9 +23,12 @@ enum Operation {
     Delete,
 }
 
+
+
 #[derive(Debug, Arbitrary)]
 struct Action {
-    op: Operation,
+    front_op: Operation,
+    back_instructions: BackendS3Instructions,
 }
 
 fuzz_target!(|x: Vec<Action>| {
@@ -49,7 +54,7 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
     let fs: S3Replication<S3Btree> = S3Replication::default();
 
     for i in x {
-        match i.op {
+        match i.front_op {
             Operation::Put => {
                 let foo = bytes::Bytes::from(b"".to_vec());
                 let sb = StreamingBlob::new(VecByteStream::new(vec![foo]));
@@ -66,10 +71,13 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
                 // println!("put ok {} not {}", a.is_ok(), a.is_err());
             }
             Operation::Get => {
+                let js = serde_json::to_string(&i.back_instructions).unwrap();
+
                 let r = S3Request::new(
                     GetObjectInput::builder()
                         .bucket("bucket".to_string())
                         .key("key".to_string())
+                        .sse_customer_key(Some(js)) //overload this field to communicate with the backend
                         .build()
                         .unwrap(),
                 );

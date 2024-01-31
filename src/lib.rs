@@ -17,3 +17,15 @@ pub use error::Error;
 pub use error::Result;
 
 pub mod tracing;
+
+pub mod fuzzing {
+    use libfuzzer_sys::arbitrary::Arbitrary;
+    use serde::Deserialize;
+    use serde::Serialize;
+
+    #[derive(Debug, Arbitrary, Serialize, Deserialize)]
+    pub struct BackendS3Instructions {
+        pub real_bucket: String,
+        pub rand_fail: bool,
+    }
+}
