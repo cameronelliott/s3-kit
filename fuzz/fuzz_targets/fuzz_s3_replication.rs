@@ -14,23 +14,19 @@ use tracing::info;
 static _INIT: Once = Once::new();
 
 #[derive(Debug, Arbitrary)]
-enum MyEnum {
+enum Operation {
     Put,
     Get,
     Head,
     Delete,
 }
 
-// this fuzzer is not for correctness, but
-// just coverage!!!
+#[derive(Debug, Arbitrary)]
+struct Action {
+    op: Operation,
+}
 
-// async fn _my_async_function_example(_data: &[u8]) -> Result<(), ()> {
-//     // Process the data asynchronously
-//     _ = _data;
-//     Ok(())
-// }
-
-fuzz_target!(|x: Vec<MyEnum>| {
+fuzz_target!(|x: Vec<Action>| {
     //  println!("fuzz_target");
 
     //let x = vec![MyEnum::Put];
@@ -43,18 +39,18 @@ fuzz_target!(|x: Vec<MyEnum>| {
     });
 });
 
-async fn my_async_function(x: Vec<MyEnum>) -> Result<(), ()> {
+async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
     // Process the data asynchronously
 
-   // info!("my_async_function");
+    // info!("my_async_function");
 
     //println!("len {:?}", x.len());
 
     let fs: S3Replication<S3Btree> = S3Replication::default();
 
     for i in x {
-        match i {
-            MyEnum::Put => {
+        match i.op {
+            Operation::Put => {
                 let foo = bytes::Bytes::from(b"".to_vec());
                 let sb = StreamingBlob::new(VecByteStream::new(vec![foo]));
                 let r = S3Request::new(
@@ -69,7 +65,7 @@ async fn my_async_function(x: Vec<MyEnum>) -> Result<(), ()> {
                 let _a = fs.put_object(r).await;
                 // println!("put ok {} not {}", a.is_ok(), a.is_err());
             }
-            MyEnum::Get => {
+            Operation::Get => {
                 let r = S3Request::new(
                     GetObjectInput::builder()
                         .bucket("bucket".to_string())
@@ -82,7 +78,7 @@ async fn my_async_function(x: Vec<MyEnum>) -> Result<(), ()> {
 
                 //println!("get ok {} not {}", a.is_ok(), a.is_err());
             }
-            MyEnum::Head => {
+            Operation::Head => {
                 let r = S3Request::new(
                     HeadObjectInput::builder()
                         .bucket("bucket".to_string())
@@ -95,7 +91,7 @@ async fn my_async_function(x: Vec<MyEnum>) -> Result<(), ()> {
 
                 //println!("head ok {} not {}", a.is_ok(), a.is_err());
             }
-            MyEnum::Delete => {
+            Operation::Delete => {
                 let r = S3Request::new(
                     DeleteObjectInput::builder()
                         .bucket("bucket".to_string())
