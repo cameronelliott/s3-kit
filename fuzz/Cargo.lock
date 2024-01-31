@@ -881,10 +881,12 @@ name = "foo-fuzz"
 version = "0.0.0"
 dependencies = [
  "arbitrary",
+ "bytes",
  "foo",
  "libfuzzer-sys",
  "s3s",
  "tokio",
+ "tracing",
 ]
 
 [[package]]

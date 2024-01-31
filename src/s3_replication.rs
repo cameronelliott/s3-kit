@@ -1,11 +1,6 @@
-#![forbid(unsafe_code)]
-#![deny(clippy::all, clippy::pedantic)]
-
 use bytes::Bytes;
 use futures::stream::FuturesUnordered;
 use futures::StreamExt;
-
-use derivative::Derivative;
 
 use s3s::dto::builders::DeleteObjectInputBuilder;
 use s3s::dto::builders::GetObjectInputBuilder;
@@ -24,10 +19,10 @@ use s3s::{S3Request, S3Response};
 use crate::utils::copy_bytes;
 use crate::vec_byte_stream::VecByteStream;
 
-#[derive(Derivative)]
-#[derivative(Debug)]
+// #[derive(Derivative)]
+// #[derivative(Debug)]
 pub struct S3Replication<T: S3 + Default> {
-    #[derivative(Debug = "ignore")]
+    //#[derivative(Debug = "ignore")]
     //target: Box<dyn S3>,
     tgts: Vec<T>,
 }
@@ -86,8 +81,12 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             let _errs = results
                 .iter()
                 .filter(|x| x.is_err()) // redundant
+                // .map(|x| match x {
+                //     Ok(_) => "".to_string(),
+                //     Err(e) => format!("{:?}", e),
+                // })
                 .map(|x| match x {
-                    Ok(_) => "".to_string(),
+                    Ok(_) => todo!(),
                     Err(e) => format!("{:?}", e),
                 })
                 .collect::<Vec<_>>();
@@ -157,7 +156,12 @@ impl<T: S3 + std::fmt::Debug + Default> S3 for S3Replication<T> {
             key, bucket, body, ..
         } = req.input;
 
+        // if there is no body, return an error
+        if body.is_none() {
+            return Err(s3_error!(InvalidRequest));
+        }
         let stream = body.unwrap();
+
         let mut result = Vec::new();
         copy_bytes(stream, &mut result).await?;
 

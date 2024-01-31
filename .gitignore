@@ -1,3 +1,5 @@
 /target
 ki
 ki2
+# code coverage report file
+lcov.info

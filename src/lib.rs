@@ -1,3 +1,7 @@
+#![feature(coverage_attribute)]
+#![forbid(unsafe_code)]
+#![deny(clippy::all, clippy::pedantic)]
+
 #[macro_use]
 pub mod error;
 pub mod checksum;

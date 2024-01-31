@@ -11,7 +11,7 @@ use s3s::{
     StdError,
 };
 
-pub(crate) struct VecByteStream {
+pub struct VecByteStream {
     queue: VecDeque<Bytes>,
     remaining_bytes: usize,
 }
