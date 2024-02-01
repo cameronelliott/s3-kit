@@ -21,10 +21,8 @@ pub mod tracing;
 
 pub mod fuzzing {
     use libfuzzer_sys::arbitrary::Arbitrary;
-    use serde::Deserialize;
-    use serde::Serialize;
 
-    #[derive(Debug, Arbitrary, Serialize, Deserialize)]
+    #[derive(Debug, Arbitrary, bitcode::Encode, bitcode::Decode)]
     pub struct BackendS3Instructions {
         pub real_bucket: String,
         pub rand_fail: bool,

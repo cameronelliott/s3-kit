@@ -54,7 +54,10 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
         match i.front_op {
             Operation::Put => {
                 //this is how we pass data to the backend
-                let bucket_js = serde_json::to_string(&i.back_instructions).unwrap();
+                let bucket_js = bitcode::encode(&i.back_instructions).unwrap();
+                let bucket_js = unsafe { String::from_utf8_unchecked(bucket_js) };
+
+                //serde_json::to_string(&i.back_instructions).unwrap();
 
                 let body = bytes::Bytes::from(b"foof".to_vec());
                 let sb = StreamingBlob::new(VecByteStream::new(vec![body]));
