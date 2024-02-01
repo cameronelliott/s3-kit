@@ -31,6 +31,7 @@ mime = "0.3.17"
 native-tls = "0.2.11"
 nugine-rust-utils = "0.3.1"
 numeric_cast = "0.2.1"
+rand = "0.8.4"
 s3s = "0.8.1"
 s3s-aws = "0.8.1"
 serde = "1.0.196"
@@ -49,7 +50,6 @@ transform-stream = "0.3.0"
 env_logger = "0.11.0"
 xflags = "0.3.2"
 
-
-
+## NOT valid here! use .cargo/config.toml
 [build]
-rustflags = ["--cfg", "fuzzing"]
+

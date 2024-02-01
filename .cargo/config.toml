@@ -1,0 +1,7 @@
+
+
+
+
+## maybe to help with vscode rust analyzer
+[build]
+rustflags = ["--cfg", "fuzzing"]
