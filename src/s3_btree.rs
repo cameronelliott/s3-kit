@@ -7,6 +7,7 @@ use std::time::SystemTime;
 use bytes::Bytes;
 
 use futures::TryStreamExt;
+
 use rust_utils::default::default;
 use s3s::dto::GetObjectInput;
 use s3s::dto::GetObjectOutput;
@@ -31,16 +32,12 @@ use crate::vec_byte_stream::VecByteStream;
 #[derive(Debug)]
 struct State {
     btree: BTreeMap<String, Vec<u8>>,
-    #[cfg(fuzzing)]
-    fake_rand: bool,
 }
 
 impl Default for State {
     fn default() -> Self {
         Self {
             btree: BTreeMap::new(),
-            #[cfg(fuzzing)]
-            fake_rand: false,
         }
     }
 }
@@ -179,17 +176,16 @@ impl S3 for S3Btree {
         {
             use crate::fuzzing::BackendS3Instructions;
             // use serde::{Deserialize, Serialize};
-            println!("btree put fuzz bucket in {:?}", _bucket);
-            let deser: BackendS3Instructions = serde_json::from_str(&_bucket).unwrap();
+
+            //let deser: BackendS3Instructions = serde_json::from_str(&_bucket).unwrap();
+            let deser: BackendS3Instructions = bitcode::decode(_bucket.as_bytes()).unwrap();
+
+            //println!("btree put fuzz {:?}", deser);
             let _real_bucket = deser.real_bucket.clone();
 
-            let mut state = self.objects.write().await;
-            println!("btree put fuzz {:?}", deser);
-
-            if deser.rand_fail && state.fake_rand {
+            if deser.rand_fail && rand::random::<bool>() {
                 return Err(s3_error!(InternalError));
             }
-            state.fake_rand = !state.fake_rand;
         }
 
         if let Some(ref storage_class) = storage_class {
@@ -199,9 +195,10 @@ impl S3 for S3Btree {
             }
         }
 
-        let Some(body) = body else {
+        if body.is_none() {
             return Err(s3_error!(IncompleteBody));
-        };
+        }
+        let body = body.unwrap();
 
         let mut checksum: crate::checksum::ChecksumCalculator = default();
         if input.checksum_crc32.is_some() {
@@ -233,7 +230,14 @@ impl S3 for S3Btree {
         let mut objects = self.objects.write().await;
         objects.btree.insert(key, vec.to_owned());
 
-        return Ok(S3Response::new(PutObjectOutput::default()));
+        let out = PutObjectOutput {
+            e_tag: Some(format!("\"{md5}\"", md5 = hex(md5_hash.finalize()))),
+            ..Default::default()
+        };
+
+        println!("put object OKAY!");
+
+        return Ok(S3Response::new(out));
     }
 
     #[tracing::instrument(skip_all)]
