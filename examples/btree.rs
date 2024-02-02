@@ -13,8 +13,8 @@ use std::path::Path;
 
 use hyper::server::Server;
 
-use foo::error::*;
-use foo::s3_btree::S3Btree;
+use s3_kit::error::*;
+use s3_kit::s3_btree::S3Btree;
 
 #[tokio::main]
 async fn main() -> Result {

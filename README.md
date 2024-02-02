@@ -45,7 +45,7 @@ filesystem server is running at http://127.0.0.1:8080
 
 You can then use the `aws` cli tool to interact with the server:
 ```bash
-cat 'hello world' > hello.txt
+echo 'hello world' > hello.txt
 aws  --endpoint-url http://localhost:8080 s3 cp hello.txt s3://bkt/hello
 aws  --endpoint-url http://localhost:8080 s3 cp s3://bkt/hello hello2.txt
 cat hello2.txt

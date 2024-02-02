@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "foo-fuzz"
+name = "s3-kit-fuzz"
 publish = false
 version = "0.0.0"
 
@@ -17,7 +17,7 @@ serde = "1.0.196"
 tokio = {version = "1", features = []}
 tracing = "0.1"
 
-[dependencies.foo]
+[dependencies.s3-kit]
 path = ".."
 
 [[bin]]

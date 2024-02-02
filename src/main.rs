@@ -4,7 +4,7 @@
 #![feature(type_alias_impl_trait)]
 #![feature(trait_alias)]
 
-use foo::tracing::setup_tracing;
+use s3_kit::tracing::setup_tracing;
 use s3s::auth::SimpleAuth;
 use s3s::service::S3ServiceBuilder;
 
@@ -15,8 +15,8 @@ use clap::Parser;
 use hyper::server::Server;
 use tracing::info;
 
-use foo::error::*;
-use foo::s3_btree::S3Btree;
+use s3_kit::error::*;
+use s3_kit::s3_btree::S3Btree;
 
 #[derive(Debug, Parser)]
 #[command(version)]
@@ -69,7 +69,7 @@ fn main() -> Result {
         root: PathBuf::from("/tmp"),
     };
     //println!("{:?}", opt);
-    check_cli_args(&opt).map_err(foo::error::Error::from_string)?;
+    check_cli_args(&opt).map_err(s3_kit::error::Error::from_string)?;
 
     setup_tracing();
 
@@ -89,7 +89,7 @@ async fn run(opt: Opt) -> Result {
     );
     let _proxy = s3s_aws::Proxy::from(client);
 
-    let fs = foo::s3_proxy_example::Proxy::<S3Btree>::new()?;
+    let fs = s3_kit::s3_proxy_example::Proxy::<S3Btree>::new()?;
 
     // Setup S3 service
     let service = {

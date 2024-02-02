@@ -1,9 +1,9 @@
 #![no_main]
 
-use foo::fuzzing::BackendS3Instructions;
-use foo::vec_byte_stream::VecByteStream;
-use foo::{s3_btree::S3Btree, s3_replication::S3Replication};
 use libfuzzer_sys::{arbitrary::Arbitrary, fuzz_target};
+use s3_kit::fuzzing::BackendS3Instructions;
+use s3_kit::vec_byte_stream::VecByteStream;
+use s3_kit::{s3_btree::S3Btree, s3_replication::S3Replication};
 use s3s::dto::StreamingBlob;
 use s3s::dto::{DeleteObjectInput, GetObjectInput, PutObjectInput};
 use s3s::S3;

@@ -4,8 +4,8 @@
 #![feature(type_alias_impl_trait)]
 #![feature(trait_alias)]
 
-use foo::s3_replication::S3Replication;
-use foo::tracing::setup_tracing;
+use s3_kit::s3_replication::S3Replication;
+use s3_kit::tracing::setup_tracing;
 use s3s::auth::{self};
 use s3s::service::S3ServiceBuilder;
 
@@ -15,8 +15,8 @@ use std::path::Path;
 
 use hyper::server::Server;
 
-use foo::error::*;
-use foo::s3_btree::S3Btree;
+use s3_kit::error::*;
+use s3_kit::s3_btree::S3Btree;
 
 #[tokio::main]
 async fn main() -> Result {

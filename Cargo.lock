@@ -916,54 +916,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
-name = "foo"
-version = "0.1.0"
-dependencies = [
- "arbitrary",
- "async-trait",
- "atty",
- "aws-config",
- "aws-sdk-s3",
- "base64-simd",
- "bitcode",
- "bytes",
- "bytes-stream",
- "clap",
- "crc32c",
- "crc32fast",
- "derivative",
- "digest",
- "env_logger",
- "futures",
- "hex-simd",
- "hyper 0.14.28",
- "hyper-tls",
- "hyper-util",
- "libfuzzer-sys",
- "md-5",
- "mime",
- "native-tls",
- "nugine-rust-utils",
- "numeric_cast",
- "rand",
- "s3s",
- "s3s-aws",
- "s3s-fs",
- "serde",
- "serde_json",
- "sha1",
- "sha2",
- "tokio",
- "tokio-native-tls",
- "tokio-util",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "transform-stream",
- "xflags",
-]
-
-[[package]]
 name = "foreign-types"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2029,6 +1981,54 @@ name = "ryu"
 version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f98d2aa92eebf49b69786be48e4477826b256916e84a57ff2a4f21923b48eb4c"
+
+[[package]]
+name = "s3-kit"
+version = "0.1.0"
+dependencies = [
+ "arbitrary",
+ "async-trait",
+ "atty",
+ "aws-config",
+ "aws-sdk-s3",
+ "base64-simd",
+ "bitcode",
+ "bytes",
+ "bytes-stream",
+ "clap",
+ "crc32c",
+ "crc32fast",
+ "derivative",
+ "digest",
+ "env_logger",
+ "futures",
+ "hex-simd",
+ "hyper 0.14.28",
+ "hyper-tls",
+ "hyper-util",
+ "libfuzzer-sys",
+ "md-5",
+ "mime",
+ "native-tls",
+ "nugine-rust-utils",
+ "numeric_cast",
+ "rand",
+ "s3s",
+ "s3s-aws",
+ "s3s-fs",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "tokio",
+ "tokio-native-tls",
+ "tokio-util",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
+ "transform-stream",
+ "xflags",
+]
 
 [[package]]
 name = "s3s"

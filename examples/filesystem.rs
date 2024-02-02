@@ -15,7 +15,7 @@ use std::path::Path;
 
 use hyper::server::Server;
 
-use foo::error::*;
+use s3_kit::error::*;
 
 #[tokio::main]
 async fn main() -> Result {

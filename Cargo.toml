@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "foo"
+name = "s3-kit"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -52,4 +52,4 @@ s3s-fs = "0.8.1"
 xflags = "0.3.2"
 
 ## NOT valid here! use .cargo/config.toml
-[build]
+## [build]
