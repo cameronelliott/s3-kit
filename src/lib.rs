@@ -28,3 +28,5 @@ pub mod fuzzing {
         pub rand_fail: bool,
     }
 }
+
+pub mod fix_await_coverage;
