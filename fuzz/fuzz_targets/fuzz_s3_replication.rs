@@ -16,7 +16,7 @@ static _INIT: Once = Once::new();
 
 #[derive(Debug, Arbitrary)]
 enum Operation {
-    Put,
+    Put { empty_body: bool },
     Get,
     Head,
     Delete,
@@ -52,7 +52,7 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
 
     for i in x {
         match i.front_op {
-            Operation::Put => {
+            Operation::Put { empty_body } => {
                 //this is how we pass data to the backend
                 let bucket_js = bitcode::encode(&i.back_instructions).unwrap();
                 let bucket_js = unsafe { String::from_utf8_unchecked(bucket_js) };
@@ -61,11 +61,15 @@ async fn my_async_function(x: Vec<Action>) -> Result<(), ()> {
 
                 let body = bytes::Bytes::from(b"foof".to_vec());
                 let sb = StreamingBlob::new(VecByteStream::new(vec![body]));
+                let body = match empty_body {
+                    true => None,
+                    false => Some(sb),
+                };
                 let r = S3Request::new(
                     PutObjectInput::builder()
                         .bucket(bucket_js)
                         .key("key".to_string())
-                        .body(Some(sb))
+                        .body(body)
                         .build()
                         .unwrap(),
                 );
