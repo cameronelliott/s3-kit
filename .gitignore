@@ -3,3 +3,5 @@ ki
 ki2
 # code coverage report file
 lcov.info
+# code coverage output
+index.html
