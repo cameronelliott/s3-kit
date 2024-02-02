@@ -1,7 +1,11 @@
 # s3-kit
 
 A toolkit for building higher level S3 applications. 
+
 The goal of this project is to eventually provide a robust distributed erasure coded S3 server that can be used locally.
+
+Towards this goal, a 100% code-coverage fuzzed S3 dual-backend replication server has been implemented.
+
 
 ## Examples
 
